@@ -99,5 +99,13 @@ public class VerificadorTipo {
         return reser;
 
     }
+    
+    public static boolean esTab(char tab){
+        boolean es= false;
+        if (tab=='\t') {
+            es=true;
+        }
+        return es;
+    }
 
 }

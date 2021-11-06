@@ -11,7 +11,7 @@ package Identificador2;
  * @author Estuardo Ramos
  */
 public  enum TipoDeDato {
-     IDENTIFICADOR("IDENTICADOR"),
+     IDENTIFICADOR("IDENTIFICADOR"),
         ENTERO("NUMERO ENTERO"),
         DECIMAL("NUMERO DECIMAL"),
         AGRUPACION("SIGNO DE AGRUPACION"),

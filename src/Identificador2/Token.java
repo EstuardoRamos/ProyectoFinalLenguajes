@@ -12,7 +12,17 @@ public class Token {
     private int fila;
     private int columna;
     private String posicion;
+    private String msj;
     private int cant;
+
+    public Token(String nombre, String lexema, int fila, int columna, String posicion, String msj) {
+        this.nombre = nombre;
+        this.lexema = lexema;
+        this.fila = fila;
+        this.columna = columna;
+        this.posicion = posicion;
+        this.msj = msj;
+    }
 
     public Token() {
     }
@@ -83,6 +93,14 @@ public class Token {
 
     public void setPosicion(String posicion) {
         this.posicion = posicion;
+    }
+
+    public String getMsj() {
+        return msj;
+    }
+
+    public void setMsj(String msj) {
+        this.msj = msj;
     }
     
     

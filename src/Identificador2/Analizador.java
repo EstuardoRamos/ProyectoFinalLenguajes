@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import sintactico.Pila;
 import sintactico.Pila2;
@@ -21,9 +20,9 @@ public class Analizador {
     String palabra;
     int posicion = 0;
     int columTmp = 1;
-    int matriz[][] = new int[11][10];
-    int estadosFinalizacion[] = new int[8];
-    String descripcionFinalizacion[] = new String[8];
+    int matriz[][] = new int[12][11];
+    int estadosFinalizacion[] = new int[9];
+    String descripcionFinalizacion[] = new String[9];
     int estadoActual = 0;
     int contadorErrores = 0;
     Token token = new Token();
@@ -69,6 +68,9 @@ public class Analizador {
         matriz[6][0] = -1;
 
         matriz[0][6] = 9;
+
+        matriz[0][8] = 12;
+
         matriz[9][0] = 10;
         matriz[9][1] = 10;
         matriz[9][2] = 10;
@@ -77,6 +79,7 @@ public class Analizador {
         matriz[9][5] = 10;
         matriz[9][6] = 11;
         matriz[9][7] = 10;
+        matriz[9][8] = 10;
 
         matriz[10][0] = 10;
         matriz[10][1] = 10;
@@ -86,6 +89,7 @@ public class Analizador {
         matriz[10][5] = 10;
         matriz[10][6] = 11;
         matriz[10][7] = 10;
+        matriz[10][8] = 10;
         matriz[10][2] = 10;
 
         //numero entero
@@ -115,6 +119,10 @@ public class Analizador {
         //literal "hola mundo"
         estadosFinalizacion[7] = 11;
         descripcionFinalizacion[7] = "LITERAL";
+
+        //Igual "="
+        estadosFinalizacion[8] = 12;
+        descripcionFinalizacion[8] = tD.IGUAL.getTipo();
     }
 
     /* public static void main(String[] args) {
@@ -173,7 +181,11 @@ public class Analizador {
                                     if (esOperador(caracter)) {
                                         resultado = 5;
                                     } else {
-                                        resultado = 7;
+                                        if (caracter == '=') {
+                                            resultado = 8;
+                                        } else {
+                                            resultado = 7;
+                                        }
                                     }
                                 }
                             }
@@ -218,32 +230,26 @@ public class Analizador {
 
                 tmp = palabra.charAt(posicion);
 
-                if (Character.isSpaceChar(tmp)) {
+                if (Character.isSpaceChar(tmp) ) {
                     if (estadoActual != 10) {
                         seguirLeyendo = false;
-
                         //System.out.println("space");
                     } else {
                         seguirLeyendo = true;
                         token += " ";
                     }
 
-                } else if (Character.isSpace(tmp)) {
+                }else if (esTab(tmp)) {
+                    System.out.println("tabulkacion");
+                    seguirLeyendo = false;
+                } 
+                else if (Character.isSpace(tmp)) {
 
                     seguirLeyendo = false;
 
                     columTmp = 0;
                     fila++;
-                } /*else if (tmp=='"') {
-
-                    do {                        
-                        seguirLeyendo = true;
-                    } while (tmp!='"');
-                    System.out.println("es titeral");
-                    
-
-                    
-                }*/ else {
+                }else {
                     int estadoTemporal = getSiguienteEstado(estadoActual, getIntCaracter(tmp));
                     if (estadoTemporal == 0) {
                         estadoTemporal = -1;
@@ -295,7 +301,7 @@ public class Analizador {
         //Pila pil = new Pila();
         Pila2 pil = new Pila2();
         //pil.receivedToken(tokens);
-        pil.receibeToken(tokens);
+        //pil.receibeToken(tokens);
         //System.out.println("Cantidad de errores: " + contadorErrores);
         return lista;
     }
