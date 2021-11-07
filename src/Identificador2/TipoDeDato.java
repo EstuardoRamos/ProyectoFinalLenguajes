@@ -29,7 +29,9 @@ public  enum TipoDeDato {
         INICIAR("INICIAR"),
         VERDADERO("VERDADERO"),
         IGUAL("IGUAL"),
-        FALSO("FALSO");
+        FALSO("FALSO"),
+        PARENTESIS_CIERRA("PARENTESIS_CIERRA"),
+        PARENTESIS_ABRE("PARENTESIS_ABRE");
     
     private String tipo;
 

@@ -91,8 +91,11 @@ public class VerificadorTipo {
             case "ENTONCES":
                 reser = "ENTONCES";
                 break;
-            case "=":
-                reser = "IGUAL";
+            case "(":
+                reser = "PARENTESIS_ABRE";
+                break;
+            case ")":
+                reser = "PARENTESIS_CIERRA";
                 break;
         }
 

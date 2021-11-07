@@ -7,6 +7,7 @@ package sintactico;
 
 import Identificador2.TipoDeDato;
 import Identificador2.Token;
+import Identificador2.archivos.Salida;
 import java.util.ArrayList;
 
 /**
@@ -29,55 +30,82 @@ public class Pila2 {
     noTerminal nTAnterior;
 
     ArrayList<Token> tokensErrores = new ArrayList<>();
+    ArrayList<String> estructuras = new ArrayList<>();
+    ArrayList<Estructura> estructurasTok = new ArrayList<>();
 
     String sintaxis;
+
+    Estructura es;
+    ArrayList<Token> tokensEstructura;
+    Salida sal = new Salida();
+
+    boolean parentesis = true;
 
     public void receibeToken(ArrayList<Token> token) {
         String next;
         nT = noTerminal.E;
+        es = new Estructura();
+        tokensEstructura = new ArrayList();
 
         for (Token token1 : token) {
 
             System.out.println(token1.getNombre());
-            System.out.println("estamos en el no terminal --> "+nT);
-            System.out.println("  el no terminal anterior es --> "+nTAnterior);
-            if (nT == noTerminal.E) {
-                sintaxis += " \n";
-            }
+            System.out.println("estamos en el no terminal --> " + nT);
+            System.out.println("  el no terminal anterior es --> " + nTAnterior + " y token anterior es " + tokenAnterior);
 
-            if (esSiguiente(token1) ) {
+            if (esSiguiente(token1)) {
                 // pasmos al siguiente
+                tokenAnterior = token1.getNombre();
                 System.out.println(token1.getNombre() + " token aceptado");
                 sintaxis += token1.getLexema() + " ";
 
-                // este debe de ser el token siguiente
-                System.out.println("El siguiente token debe de ser un " + tokensSiguientes+ "\n");
-            } else {
-                 
+                tokensEstructura.add(token1);
 
-                    String msjError = "se esperaba un " + tokensSiguientes;
-                    Token tokCorrec = new Token(tokenSiguiente, "");
-                    token1.setMsj(msjError);
-                    tokensErrores.add(token1);
-                    esSiguiente(tokCorrec);
-                    //movimientos(tokCorrec);
-                    System.out.println(msjError);
-                    sintaxis += token1.getLexema() + " <-error ";
-                
+                // este debe de ser el token siguiente
+                System.out.println("El siguiente token debe de ser un " + tokensSiguientes + "\n");
+            } else {
+
+                String msjError = "se esperaba un " + tokensSiguientes;
+                Token tokCorrec = new Token(tokenSiguiente, "");
+                token1.setMsj(msjError);
+                tokensErrores.add(token1);
+                esSiguiente(tokCorrec);
+                //movimientos(tokCorrec);
+                System.out.println(msjError);
+                sintaxis += token1.getLexema() + " <-error ";
+
+            }
+            if (nT == noTerminal.E && nTAnterior != null) {
+                es.setTokens(tokensEstructura);
+                estructurasTok.add(es);
+                es = new Estructura();
+                tokensEstructura = new ArrayList();
+                estructuras.add(sintaxis);
+                sintaxis = "";
             }
 
         }
         System.out.println("----------Sintaxis-------------------------------");
         System.out.println(sintaxis);
+        System.out.println("");
+        System.out.println("");
+        System.out.println("_____________________________________________________________________________");
 
+        //sal.revisarEstructura(estructurasTok);
         next = tokenSiguiente;
 
     }
 
+    public ArrayList<String> getEstructuras() {
+        return estructuras;
+    }
+
     public boolean esSiguiente(Token token) {
+
         if (nT == noTerminal.E) {
             if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo())) {
                 nT = noTerminal.S;
+                nTAnterior = noTerminal.E;
                 tokenSiguiente = TipoDeDato.LITERAL.getTipo();
                 tokensSiguientes = TipoDeDato.LITERAL.getTipo() + " 0 " + TipoDeDato.IDENTIFICADOR.getTipo();
                 return true;
@@ -85,6 +113,7 @@ public class Pila2 {
                 if (token.getNombre().equals(TipoDeDato.REPETIR.getTipo())) {
                     nT = noTerminal.P;
                     tokenSiguiente = TipoDeDato.ENTERO.getTipo();
+                    tokensSiguientes = TipoDeDato.ENTERO.getTipo();
                     return true;
                 } else {
                     if (token.getNombre().equals(TipoDeDato.SI.getTipo())) {
@@ -104,7 +133,7 @@ public class Pila2 {
                                 tokenSiguiente = TipoDeDato.OPERADOR.getTipo();
                                 tokensSiguientes = TipoDeDato.OPERADOR.getTipo();
                                 return true;
-                            }else{
+                            } else {
                                 System.out.print(" -->No es inicial");
                                 return false;
                             }
@@ -130,10 +159,10 @@ public class Pila2 {
                     } else {
                         if (nT == noTerminal.A) {
                             return A(token);
-                        }else{
+                        } else {
                             if (nT == noTerminal.EP) {
-                            return Condicion(token);
-                        }
+                                return Condicion(token);
+                            }
                         }
                     }
                 }
@@ -141,7 +170,9 @@ public class Pila2 {
             }
 
         }
+
         return false;
+
     }
 
     public boolean Escribir(Token token) {
@@ -152,7 +183,7 @@ public class Pila2 {
             return true;
         } else {
             if (token.getNombre().equals(TipoDeDato.FIN.getTipo())) {
-                System.out.println("el no terminal anterior es "+nTAnterior);
+                System.out.println("el no terminal anterior es " + nTAnterior);
                 if (nTAnterior == noTerminal.P || nTAnterior == noTerminal.EP) {
                     nT = nTAnterior;
                     nTAnterior = noTerminal.S;
@@ -163,7 +194,7 @@ public class Pila2 {
                     System.out.println("-------------------------------------");
 
                 }
-                System.out.println("el no terminal actual es "+nT);
+                System.out.println("el no terminal actual es " + nT);
                 return true;
             }
             if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo())) {
@@ -177,7 +208,7 @@ public class Pila2 {
     }
 
     public boolean Repetir(Token token) {
-        if (token.getNombre().equals(TipoDeDato.IDENTIFICADOR.getTipo()) || token.getNombre().equals(TipoDeDato.ENTERO.getTipo())) {
+        if (token.getNombre().equals((TipoDeDato.IDENTIFICADOR.getTipo())) && tokenAnterior.equals(TipoDeDato.REPETIR.getTipo()) || token.getNombre().equals(TipoDeDato.ENTERO.getTipo())) {
             nT = noTerminal.P;
             tokenSiguiente = TipoDeDato.INICIAR.getTipo();
             tokensSiguientes = TipoDeDato.INICIAR.getTipo();
@@ -190,7 +221,7 @@ public class Pila2 {
                 tokensSiguientes = TipoDeDato.ESCRIBIR.getTipo();
                 return true;
             } else {
-                if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && nTAnterior==noTerminal.S) {
+                if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && nTAnterior == noTerminal.S) {
                     nT = noTerminal.E;
                     nTAnterior = noTerminal.E;
                     tokenSiguiente = "";
@@ -198,28 +229,29 @@ public class Pila2 {
                     System.out.println("Fin de repetir");
                     //sintaxis+="\n";
                     return true;
-                }else{
-                    if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo()) && nTAnterior==noTerminal.S) {
-                    nT = noTerminal.S;
-                    nTAnterior=noTerminal.P;
-                    //nTAnterior = noTerminal.E;
-                    //tokenSiguiente = "";
-                    //tokensSiguientes = "Iniciar";
-                    //sintaxis+="\n";
-                    return true;
-                }else{
+                } else {
+                    if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo()) && nTAnterior == noTerminal.S) {
+                        nT = noTerminal.S;
+                        nTAnterior = noTerminal.P;
+                        //nTAnterior = noTerminal.E;
+                        //tokenSiguiente = "";
+                        //tokensSiguientes = "Iniciar";
+                        //sintaxis+="\n";
+                        return true;
+                    } else {
                         return false;
                     }
                 }
             }
 
         }
-        
+
     }
 
     public boolean Condicion(Token token) {
 
         if (token.getNombre().equals(TipoDeDato.VERDADERO.getTipo()) || token.getNombre().equals(TipoDeDato.FALSO.getTipo())) {
+            System.out.println(tokenAnterior.equals(TipoDeDato.SI.getTipo()) + "Tipo " + TipoDeDato.SI.getTipo() + " ante " + tokenAnterior);
             nT = noTerminal.EP;
             tokenSiguiente = TipoDeDato.ENTONCES.getTipo();
             tokensSiguientes = TipoDeDato.ENTONCES.getTipo();
@@ -233,21 +265,20 @@ public class Pila2 {
                 tokensSiguientes = TipoDeDato.ESCRIBIR.getTipo();
                 return true;
             } else {
-                if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && nTAnterior==noTerminal.S) {
+                if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && nTAnterior == noTerminal.S) {
                     nT = noTerminal.E;
                     tokenSiguiente = "";
                     tokensSiguientes = "Iniciar";
 
                     return true;
 
-                }else{
+                } else {
                     return false;
                 }
             }
 
         }
 
-        
     }
 
     public boolean Asignacion(Token token) {
@@ -299,6 +330,26 @@ public class Pila2 {
                     tokensSiguientes = "Iniciar";
                     return true;
 
+                } else {
+                    if (token.getNombre().equals(TipoDeDato.PARENTESIS_ABRE.getTipo())) {
+                        nT = noTerminal.X;
+                        tokenSiguiente = TipoDeDato.ENTERO.getTipo();
+                        tokensSiguientes = TipoDeDato.ENTERO.getTipo()+" o "+TipoDeDato.IDENTIFICADOR.getTipo();
+                        parentesis = false;
+                        if (!parentesis) {
+                            return false;
+                        }else{
+                            return true;
+                        }
+                    } else {
+                        if (token.getNombre().equals(TipoDeDato.PARENTESIS_CIERRA.getTipo())) {
+                            nT = noTerminal.X;
+                            tokenSiguiente = "";
+                            tokensSiguientes = TipoDeDato.ENTERO.getTipo()+" o "+TipoDeDato.IDENTIFICADOR.getTipo()+" o "+TipoDeDato.FIN.getTipo();
+                            parentesis = true;
+                            return true;
+                        }
+                    }
                 }
 
             }
@@ -333,6 +384,14 @@ public class Pila2 {
             return true;
         }*/
         return false;
+    }
+
+    public boolean esTF(String tok) {
+        if (tok.equals(TipoDeDato.VERDADERO.getTipo()) || tok.equals(TipoDeDato.FALSO.getTipo())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public ArrayList<Token> getTokensErrores() {
