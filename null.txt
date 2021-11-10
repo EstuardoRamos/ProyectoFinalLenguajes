@@ -1,0 +1,31 @@
+null<html>
+<head>
+<title>ESTA ES UN DOCUMENTO HTML</TITLE>
+</head>
+<body>
+<h1 style='color: blue'>Este es un titulo 1</h1>
+<p>Este es un parrafo</p>
+<h2>Tabla</h2>
+<tr>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Ernst Handel</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Roland Mendel</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Buenos Aires</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Argentina</td>
+</tr>
+<tr>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Island Trading</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Helen Bennett</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Londres</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>UK</td>
+</tr>
+<tr>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Island Trading</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Helen Bennett</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>Londres</td>
+<td style='border: 1px solid gray;text-align: left;padding: 8px;'>UK</td>
+</tr>
+</table>
+<p>ES UNA CONDICIONAL VERDADERA</p>
+agragando nuevalinea
+agragando otra  nuevalinea
+

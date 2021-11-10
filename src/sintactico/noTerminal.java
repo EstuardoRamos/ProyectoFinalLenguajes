@@ -23,7 +23,9 @@ public enum noTerminal {
         L,
         Q,
         N,
-        T;
+        T,
+        F,
+        TP;
     
     
 

@@ -4,12 +4,16 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/sintactico/noTerminal.java</file>
+            <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/archivos/ManejadorArchivos.java</file>
+            <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/sintactico/Identificadores.java</file>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/sintactico/Pila2.java</file>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/ventanas/AnalizadorFrame.java</file>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/Analizador.java</file>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/TipoDeDato.java</file>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/Token.java</file>
+            <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/archivos/Salida.java</file>
             <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/Identificador2/VerificadorTipo.java</file>
+            <file>file:/home/estuardo/NetBeansProjects/ProyectoFinalLenguajes/src/sintactico/Estructura.java</file>
         </group>
     </open-files>
 </project-private>

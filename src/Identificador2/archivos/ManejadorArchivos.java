@@ -26,7 +26,7 @@ public class ManejadorArchivos {
     private String direccion;
     File archivo;
     
-    static String NAME_Archivo="/salida.txt";
+    static String NAME_Archivo=".txt";
     
     public static void main(String[] args) {
          ManejadorArchivos man = new ManejadorArchivos();
@@ -38,7 +38,7 @@ public class ManejadorArchivos {
     }
 
     //Lee un archivo de entrada y lo carga al text area
-    public void cargarArchivos(JTextArea cadenaTxt, JButton guardar) {
+    public void cargarArchivos(JTextArea cadenaTxt, JButton guardar, boolean archivoCargado) {
         JFileChooser fc = new JFileChooser();
         fc.showOpenDialog(null);
         archivo = fc.getSelectedFile();
@@ -52,6 +52,7 @@ public class ManejadorArchivos {
             }
             cadenaTxt.setText(texto);
             guardar.setEnabled(true);
+            archivoCargado=true;
             JOptionPane.showMessageDialog(null, "Archivo cargado puede analizarlo");
             contenido = texto;
         } catch (Exception e) {
@@ -65,6 +66,7 @@ public class ManejadorArchivos {
         {
             try {
                 printWriter = new PrintWriter(archivo);
+                JOptionPane.showMessageDialog(null, "Se guardaron los cambios");
             } catch (FileNotFoundException e) {
                 JOptionPane.showMessageDialog(null, "Error archivo no puede guasrdarse");
             }
@@ -77,10 +79,8 @@ public class ManejadorArchivos {
     
     public  void seleccionarUbicacionArchivo(){
         JFileChooser fc = new JFileChooser();
-        fc.showOpenDialog(null);
-        //archivo = fc.getSelectedFile();
-        archivo = fc.getCurrentDirectory();
-        
+        fc.showSaveDialog(null);
+        archivo = fc.getSelectedFile();
         File nuevoArch;
         direccion=archivo+NAME_Archivo;
         System.out.println(archivo+NAME_Archivo);
@@ -88,7 +88,8 @@ public class ManejadorArchivos {
             nuevoArch = new File(archivo+NAME_Archivo);
             
             if (nuevoArch.createNewFile()) {
-                JOptionPane.showMessageDialog(null, "Nuevo archivo creado");
+                
+                JOptionPane.showMessageDialog(null, "Nuevo archivo de salida creado");
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error archivo no puede crearse");
@@ -96,28 +97,37 @@ public class ManejadorArchivos {
         
         
         
-        /*try {
-            FileReader fr = new FileReader(archivo);
-            BufferedReader br= new BufferedReader(fr);
-            String texto="";
-            String linea="";
-            while((linea=br.readLine()) != null) {
-                texto+=linea+"\n";
-            }
-            cadenaTxt.setText(texto);
-            guardar.setEnabled(true);
-            JOptionPane.showMessageDialog(null, "Archivo cargado puede analizarlo");
-            contenido = texto;
-        } catch (Exception e) {
-        }*/
+        
     }
     
     public void escribirNuevo(String nuevo) {
+        JFileChooser fc = new JFileChooser();
+        fc.showSaveDialog(null);
+        archivo = fc.getSelectedFile();
+        File nuevoArch;
+        direccion=archivo+NAME_Archivo;
+        System.out.println(archivo+NAME_Archivo);
+        
         PrintWriter printWriter = null;
         String textToBeWritten = nuevo;
         {
             try {
                 printWriter = new PrintWriter(direccion);
+            } catch (FileNotFoundException e) {
+                JOptionPane.showMessageDialog(null, "Error archivo no puede guasrdarse");
+            }
+            Objects.requireNonNull(printWriter).println(textToBeWritten);
+            printWriter.close();
+        }
+
+    }
+    
+    public void guardarNuevo(String modificado) {
+        PrintWriter printWriter = null;
+        String textToBeWritten = modificado;
+        {
+            try {
+                printWriter = new PrintWriter(archivo);
             } catch (FileNotFoundException e) {
                 JOptionPane.showMessageDialog(null, "Error archivo no puede guasrdarse");
             }

@@ -18,6 +18,11 @@ public class Estructura {
     String tipo;
     ArrayList<Token> tokens;
     boolean aceptada;
+    int cant;
+
+    public int getCant() {
+        return cant;
+    }
 
     public Estructura() {
     }

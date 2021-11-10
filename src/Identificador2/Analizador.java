@@ -20,7 +20,7 @@ public class Analizador {
     String palabra;
     int posicion = 0;
     int columTmp = 1;
-    int matriz[][] = new int[12][11];
+    int matriz[][] = new int[14][13];
     int estadosFinalizacion[] = new int[9];
     String descripcionFinalizacion[] = new String[9];
     int estadoActual = 0;
@@ -46,6 +46,7 @@ public class Analizador {
         matriz[0][3] = 6;
         matriz[0][4] = 7;
         matriz[0][5] = 8;
+        matriz[0][9] = 13;
 
         matriz[1][0] = 1;
         matriz[1][1] = 2;
@@ -90,7 +91,11 @@ public class Analizador {
         matriz[10][6] = 11;
         matriz[10][7] = 10;
         matriz[10][8] = 10;
+        matriz[10][9] = 10;
         matriz[10][2] = 10;
+
+        matriz[13][0] = 1;
+        matriz[13][2] = 4;
 
         //numero entero
         estadosFinalizacion[0] = 1;
@@ -166,25 +171,31 @@ public class Analizador {
                 if (caracter == 'ñ') {
                     resultado = -1;
                 } else {
-                    if (Character.isLetter(caracter) || esGuion(caracter)) {
+                    if (Character.isLetter(caracter)) {
                         resultado = 2;
                     } else {
                         if (caracter == '"') {
                             resultado = 6;
                         } else {
-                            if (esSignoAgrupacion(caracter)) {
-                                resultado = 4;
+                            if (caracter == '-') {
+                                resultado = 9;
                             } else {
-                                if (esSignoDePuntuacion(caracter)) {
-                                    resultado = 3;
+
+                                if (esSignoAgrupacion(caracter)) {
+                                    resultado = 4;
                                 } else {
-                                    if (esOperador(caracter)) {
-                                        resultado = 5;
+                                    if (esSignoDePuntuacion(caracter)) {
+                                        resultado = 3;
                                     } else {
-                                        if (caracter == '=') {
-                                            resultado = 8;
+                                        if (esOperador(caracter)) {
+                                            resultado = 5;
                                         } else {
-                                            resultado = 7;
+                                            if (caracter == '=') {
+                                                resultado = 8;
+                                            } else {
+
+                                                resultado = 7;
+                                            }
                                         }
                                     }
                                 }
@@ -218,7 +229,8 @@ public class Analizador {
     public ArrayList getToken(String palabra, JTextArea TOK, JTextArea estados) {
 
         ArrayList<String> lista = new ArrayList();
-
+        Token tokenO;
+        Token token1;
         while (posicion < palabra.length()) {
             estadoActual = 0;
             String token = "";
@@ -230,7 +242,7 @@ public class Analizador {
 
                 tmp = palabra.charAt(posicion);
 
-                if (Character.isSpaceChar(tmp) ) {
+                if (Character.isSpaceChar(tmp)) {
                     if (estadoActual != 10) {
                         seguirLeyendo = false;
                         //System.out.println("space");
@@ -239,43 +251,77 @@ public class Analizador {
                         token += " ";
                     }
 
-                }else if (esTab(tmp)) {
-                    System.out.println("tabulkacion");
-                    seguirLeyendo = false;
-                } 
-                else if (Character.isSpace(tmp)) {
+                } else {
+                    if (tmp == '(') {
 
-                    seguirLeyendo = false;
-
-                    columTmp = 0;
-                    fila++;
-                }else {
-                    int estadoTemporal = getSiguienteEstado(estadoActual, getIntCaracter(tmp));
-                    if (estadoTemporal == 0) {
-                        estadoTemporal = -1;
-
-                    }
-                    //                                          4,0
-                    String moviminetos = "S" + estadoActual + " --------- " + tmp + "-------->  S" + estadoTemporal + "\n";
-                    estados.append(moviminetos);
-                    token += tmp;
-                    estadoActual = estadoTemporal;
-                    estadoA = getEstadoAceptacion(estadoActual);
-
-                    if (estadoActual == -1) {
+                        if (estadoA != null) {
+                            token1 = new Token(esReservada(token, estadoA), token, filaF, columna);
+                            tokens.add(token1);
+                        }
                         seguirLeyendo = false;
+                        estadoA = TipoDeDato.PARENTESIS_ABRE.getTipo();
+                        token = "(";
+                        System.out.println("parentesis abre---->");
+
+                        //tokenO = new Token(TipoDeDato.PARENTESIS_ABRE.getTipo(), "(", filaF, columna);
+                        //tokens.add(tokenO);
+                        //estadoA = TipoDeDato.PARENTESIS_ABRE.getTipo();
+                        //token = "(";
+                    } else {
+                        if (tmp == ')') {
+                            if (estadoA != null) {
+                                token1 = new Token(esReservada(token, estadoA), token, filaF, columna);
+                                tokens.add(token1);
+                            }
+                            System.out.println(estadoA + " token----->>>>>>>>>>>>> " + token);
+
+                            seguirLeyendo = false;
+
+                            //tokenO = new Token(TipoDeDato.PARENTESIS_CIERRA.getTipo(), ")", filaF, columna);
+                            //tokens.add(tokenO);
+                            estadoA = TipoDeDato.PARENTESIS_CIERRA.getTipo();
+                            token = ")";
+                            System.out.println("parentesis cierra---->");
+                        } else {
+                            if (esTab(tmp)) {
+                                seguirLeyendo = false;
+                            } else {
+                                if (Character.isSpace(tmp)) {
+                                    seguirLeyendo = false;
+                                    columTmp = 0;
+                                    fila++;
+                                } else {
+                                    int estadoTemporal = getSiguienteEstado(estadoActual, getIntCaracter(tmp));
+                                    if (estadoTemporal == 0) {
+                                        estadoTemporal = -1;
+
+                                    }
+                                    //                                          4,0
+                                    String moviminetos = "S" + estadoActual + " --------- " + tmp + "-------->  S" + estadoTemporal + "\n";
+                                    estados.append(moviminetos);
+                                    token += tmp;
+                                    estadoActual = estadoTemporal;
+                                    estadoA = getEstadoAceptacion(estadoActual);
+
+                                    if (estadoActual == -1) {
+                                        seguirLeyendo = false;
+                                    }
+
+                                    //columTmp=posicion;
+                                    columna = columTmp;
+                                    filaF = fila;
+
+                                }
+                            }
+                        }
                     }
-
-                    //columTmp=posicion;
-                    columna = columTmp;
-                    filaF = fila;
-
                 }
+
                 columTmp++;
                 posicion++;
             }
             if (estadoA != null) {
-                Token tokenO = new Token(esReservada(token, estadoA), token, filaF, columna);
+                tokenO = new Token(esReservada(token, estadoA), token, filaF, columna);
 
                 String msj = "***TOKEN " + esReservada(token, estadoA) + ": " + token + "\n";
 

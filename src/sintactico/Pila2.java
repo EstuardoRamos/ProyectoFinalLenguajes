@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package sintactico;
 
 import Identificador2.TipoDeDato;
 import Identificador2.Token;
 import Identificador2.archivos.Salida;
 import java.util.ArrayList;
+import static sintactico.Tipo.tipoEstructura;
 
 /**
  *
@@ -53,14 +49,12 @@ public class Pila2 {
             System.out.println("estamos en el no terminal --> " + nT);
             System.out.println("  el no terminal anterior es --> " + nTAnterior + " y token anterior es " + tokenAnterior);
 
-            if (esSiguiente(token1)) {
+            if (shift(token1)) {
                 // pasmos al siguiente
                 tokenAnterior = token1.getNombre();
                 System.out.println(token1.getNombre() + " token aceptado");
                 sintaxis += token1.getLexema() + " ";
-
                 tokensEstructura.add(token1);
-
                 // este debe de ser el token siguiente
                 System.out.println("El siguiente token debe de ser un " + tokensSiguientes + "\n");
             } else {
@@ -69,29 +63,29 @@ public class Pila2 {
                 Token tokCorrec = new Token(tokenSiguiente, "");
                 token1.setMsj(msjError);
                 tokensErrores.add(token1);
-                esSiguiente(tokCorrec);
-                //movimientos(tokCorrec);
+                shift(tokCorrec);
                 System.out.println(msjError);
                 sintaxis += token1.getLexema() + " <-error ";
+                nT= noTerminal.E;
 
             }
             if (nT == noTerminal.E && nTAnterior != null) {
                 es.setTokens(tokensEstructura);
+                es.setTipo(tipoEstructura(nTAnterior));
                 estructurasTok.add(es);
                 es = new Estructura();
                 tokensEstructura = new ArrayList();
                 estructuras.add(sintaxis);
                 sintaxis = "";
+                
             }
 
         }
-        System.out.println("----------Sintaxis-------------------------------");
-        System.out.println(sintaxis);
-        System.out.println("");
-        System.out.println("");
-        System.out.println("_____________________________________________________________________________");
-
-        //sal.revisarEstructura(estructurasTok);
+        
+        
+        if (tokensErrores.isEmpty()) {
+            //sal.revisarEstructura(estructurasTok);
+        }
         next = tokenSiguiente;
 
     }
@@ -100,7 +94,7 @@ public class Pila2 {
         return estructuras;
     }
 
-    public boolean esSiguiente(Token token) {
+    public boolean shift(Token token) {
 
         if (nT == noTerminal.E) {
             if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo())) {
@@ -111,6 +105,7 @@ public class Pila2 {
                 return true;
             } else {
                 if (token.getNombre().equals(TipoDeDato.REPETIR.getTipo())) {
+                    nTAnterior=nT;
                     nT = noTerminal.P;
                     tokenSiguiente = TipoDeDato.ENTERO.getTipo();
                     tokensSiguientes = TipoDeDato.ENTERO.getTipo();
@@ -162,6 +157,10 @@ public class Pila2 {
                         } else {
                             if (nT == noTerminal.EP) {
                                 return Condicion(token);
+                            } else {
+                                if (nT == noTerminal.F) {
+                                   // return F(token);
+                                }
                             }
                         }
                     }
@@ -177,6 +176,7 @@ public class Pila2 {
 
     public boolean Escribir(Token token) {
         if (token.getNombre().equals(TipoDeDato.LITERAL.getTipo()) || token.getNombre().equals(TipoDeDato.IDENTIFICADOR.getTipo())) {
+            //nTAnterior=nT;
             nT = noTerminal.S;
             tokenSiguiente = TipoDeDato.FIN.getTipo();
             tokensSiguientes = TipoDeDato.FIN.getTipo();
@@ -189,6 +189,7 @@ public class Pila2 {
                     nTAnterior = noTerminal.S;
                 } else {
                     nT = noTerminal.E;
+                    nTAnterior = noTerminal.S;
                     tokenSiguiente = "";
                     tokensSiguientes = "";
                     System.out.println("-------------------------------------");
@@ -197,7 +198,7 @@ public class Pila2 {
                 System.out.println("el no terminal actual es " + nT);
                 return true;
             }
-            if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo())) {
+            if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo()) && (nTAnterior == noTerminal.P || nTAnterior == noTerminal.EP)) {
                 nT = noTerminal.S;
                 tokenSiguiente = TipoDeDato.LITERAL.getTipo();
                 return true;
@@ -208,13 +209,13 @@ public class Pila2 {
     }
 
     public boolean Repetir(Token token) {
-        if (token.getNombre().equals((TipoDeDato.IDENTIFICADOR.getTipo())) && tokenAnterior.equals(TipoDeDato.REPETIR.getTipo()) || token.getNombre().equals(TipoDeDato.ENTERO.getTipo())) {
+        if ((token.getNombre().equals((TipoDeDato.IDENTIFICADOR.getTipo()))  || token.getNombre().equals(TipoDeDato.ENTERO.getTipo())) && nTAnterior==noTerminal.E) {
             nT = noTerminal.P;
             tokenSiguiente = TipoDeDato.INICIAR.getTipo();
             tokensSiguientes = TipoDeDato.INICIAR.getTipo();
             return true;
         } else {
-            if (token.getNombre().equals(TipoDeDato.INICIAR.getTipo())) {
+            if (token.getNombre().equals(TipoDeDato.INICIAR.getTipo()) && nTAnterior==noTerminal.E) {
                 nTAnterior = noTerminal.P;
                 nT = noTerminal.S;
                 tokenSiguiente = TipoDeDato.ESCRIBIR.getTipo();
@@ -222,21 +223,15 @@ public class Pila2 {
                 return true;
             } else {
                 if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && nTAnterior == noTerminal.S) {
+                    nTAnterior = nT;
                     nT = noTerminal.E;
-                    nTAnterior = noTerminal.E;
                     tokenSiguiente = "";
                     tokensSiguientes = "Iniciar";
-                    System.out.println("Fin de repetir");
-                    //sintaxis+="\n";
                     return true;
                 } else {
                     if (token.getNombre().equals(TipoDeDato.ESCRIBIR.getTipo()) && nTAnterior == noTerminal.S) {
                         nT = noTerminal.S;
                         nTAnterior = noTerminal.P;
-                        //nTAnterior = noTerminal.E;
-                        //tokenSiguiente = "";
-                        //tokensSiguientes = "Iniciar";
-                        //sintaxis+="\n";
                         return true;
                     } else {
                         return false;
@@ -265,7 +260,8 @@ public class Pila2 {
                 tokensSiguientes = TipoDeDato.ESCRIBIR.getTipo();
                 return true;
             } else {
-                if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && nTAnterior == noTerminal.S) {
+                if (token.getNombre().equals(TipoDeDato.FIN.getTipo()) && (nTAnterior == noTerminal.S || nTAnterior == noTerminal.EP)) {
+                    nTAnterior = noTerminal.EP;
                     nT = noTerminal.E;
                     tokenSiguiente = "";
                     tokensSiguientes = "Iniciar";
@@ -284,6 +280,7 @@ public class Pila2 {
     public boolean Asignacion(Token token) {
 
         if (token.getNombre().equals(TipoDeDato.IGUAL.getTipo())) {
+            nTAnterior=noTerminal.A;
             nT = noTerminal.X;
             tokenSiguiente = TipoDeDato.ENTONCES.getTipo();
             tokensSiguientes = TipoDeDato.ENTONCES.getTipo();
@@ -318,13 +315,14 @@ public class Pila2 {
             tokensSiguientes = TipoDeDato.ENTERO.getTipo();
             return true;
         } else {
-            if (token.getNombre().equals(TipoDeDato.ENTERO.getTipo()) || token.getNombre().equals(TipoDeDato.IDENTIFICADOR.getTipo())) {
+            if (token.getNombre().equals(TipoDeDato.ENTERO.getTipo()) || token.getNombre().equals(TipoDeDato.IDENTIFICADOR.getTipo()) || token.getNombre().equals(TipoDeDato.DECIMAL.getTipo())) {
                 nT = noTerminal.X;
                 tokenSiguiente = TipoDeDato.SIGNO_MAS.getTipo() + " o " + TipoDeDato.SIGNO_POR.getTipo() + " o " + TipoDeDato.FIN.getTipo();
                 tokensSiguientes = TipoDeDato.SIGNO_MAS.getTipo() + " o " + TipoDeDato.SIGNO_POR.getTipo() + " o " + TipoDeDato.FIN.getTipo();
                 return true;
             } else {
                 if (token.getNombre().equals(TipoDeDato.FIN.getTipo())) {
+                    nTAnterior=nT;
                     nT = noTerminal.E;
                     tokenSiguiente = "";
                     tokensSiguientes = "Iniciar";
@@ -334,18 +332,13 @@ public class Pila2 {
                     if (token.getNombre().equals(TipoDeDato.PARENTESIS_ABRE.getTipo())) {
                         nT = noTerminal.X;
                         tokenSiguiente = TipoDeDato.ENTERO.getTipo();
-                        tokensSiguientes = TipoDeDato.ENTERO.getTipo()+" o "+TipoDeDato.IDENTIFICADOR.getTipo();
-                        parentesis = false;
-                        if (!parentesis) {
-                            return false;
-                        }else{
-                            return true;
-                        }
+                        tokensSiguientes = TipoDeDato.ENTERO.getTipo() + " o " + TipoDeDato.IDENTIFICADOR.getTipo();
+                        return true;
                     } else {
                         if (token.getNombre().equals(TipoDeDato.PARENTESIS_CIERRA.getTipo())) {
                             nT = noTerminal.X;
                             tokenSiguiente = "";
-                            tokensSiguientes = TipoDeDato.ENTERO.getTipo()+" o "+TipoDeDato.IDENTIFICADOR.getTipo()+" o "+TipoDeDato.FIN.getTipo();
+                            tokensSiguientes = TipoDeDato.ENTERO.getTipo() + " o " + TipoDeDato.IDENTIFICADOR.getTipo() + " o " + TipoDeDato.FIN.getTipo();
                             parentesis = true;
                             return true;
                         }
@@ -374,28 +367,20 @@ public class Pila2 {
             return true;
         }
         if (token.getNombre().equals(TipoDeDato.IGUAL.getTipo())) {
+            nTAnterior=nT;
             nT = noTerminal.X;
             tokenSiguiente = TipoDeDato.ENTERO.getTipo();
             tokensSiguientes = TipoDeDato.ENTERO.getTipo();
             return true;
         }
-        /*if (token.getNombre().equals(TipoDeDato.FIN.getTipo())) {
-            nT = noTerminal.E;
-            return true;
-        }*/
         return false;
     }
 
-    public boolean esTF(String tok) {
-        if (tok.equals(TipoDeDato.VERDADERO.getTipo()) || tok.equals(TipoDeDato.FALSO.getTipo())) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public ArrayList<Token> getTokensErrores() {
         return tokensErrores;
     }
+    
+    
 
 }
