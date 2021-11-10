@@ -10,12 +10,7 @@ import sintactico.Estructura;
  */
 public class Salida {
 
-    public static void main(String[] args) {
-        String opString = "5";
-        int opNum = Integer.valueOf(opString);
-        System.out.println(opNum);
-    }
-
+    
     String txt;
 
     public void Repetir(ArrayList<Token> token) {

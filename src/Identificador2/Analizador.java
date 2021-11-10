@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import sintactico.Pila;
 import sintactico.Pila2;
 
 /**
@@ -260,8 +259,7 @@ public class Analizador {
                         }
                         seguirLeyendo = false;
                         estadoA = TipoDeDato.PARENTESIS_ABRE.getTipo();
-                        token = "(";
-                        System.out.println("parentesis abre---->");
+                       
 
                         //tokenO = new Token(TipoDeDato.PARENTESIS_ABRE.getTipo(), "(", filaF, columna);
                         //tokens.add(tokenO);
@@ -273,8 +271,6 @@ public class Analizador {
                                 token1 = new Token(esReservada(token, estadoA), token, filaF, columna);
                                 tokens.add(token1);
                             }
-                            System.out.println(estadoA + " token----->>>>>>>>>>>>> " + token);
-
                             seguirLeyendo = false;
 
                             //tokenO = new Token(TipoDeDato.PARENTESIS_CIERRA.getTipo(), ")", filaF, columna);

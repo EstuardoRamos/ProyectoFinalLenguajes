@@ -84,7 +84,7 @@ public class Pila2 {
         
         
         if (tokensErrores.isEmpty()) {
-            //sal.revisarEstructura(estructurasTok);
+            sal.revisarEstructura(estructurasTok);
         }
         next = tokenSiguiente;
 
